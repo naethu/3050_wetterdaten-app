@@ -1,8 +1,8 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import json
 import os
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
@@ -14,13 +14,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-data_file_path = os.path.join(os.path.dirname(__file__), '../data/meteodaten_2023_daily.json')
+def load_data():
+    json_file_path = os.path.join(os.path.dirname(__file__), "..", "data", "meteodaten_2023_daily.json")
+    with open(json_file_path, "r") as file:
+        data = json.load(file)
+    return data
 
-@app.get("/meteodaten", response_class=JSONResponse)
+@app.get("/")
 async def get_meteodaten():
     try:
-        with open(data_file_path, 'r') as file:
-            data = json.load(file)
+        data = load_data()
         return JSONResponse(content=data)
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)

@@ -1,47 +1,89 @@
-import React from 'react';
-import { Table } from '@mui/material';
-import { MeteoData as MeteoDataType } from '../types/meteodata'; // Umbenennung des Imports, um Konflikte zu vermeiden
+// src/components/MeteoDataTable.tsx
+import React, { useEffect, useState } from 'react';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    CircularProgress,
+    Typography,
+} from '@mui/material';
 
-interface MeteoDataTableProps {
-    data: MeteoDataType | null; // Verwende den umbenannten Typ
+interface MeteoData {
+    Datum: number;
+    Standort: string;
+    Standortname: string;
+    WGS84_lat: number;
+    WGS84_lng: number;
+    RainDur: number;
+    StrGlo: number | null;
+    T: number;
+    T_max_h1: number;
+    p: number;
 }
 
-const MeteoDataTable: React.FC<MeteoDataTableProps> = ({ data }) => {
-    if (!data) {
-        return <div>Bitte klicken Sie auf einen Punkt auf der Karte, um die Daten anzuzeigen.</div>; // Hinweis, wenn keine Daten vorhanden sind
+const MeteoDataTable: React.FC = () => {
+    const [data, setData] = useState<MeteoData[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:8000');
+                if (!response.ok) {
+                    throw new Error('Netzwerkantwort war nicht ok');
+                }
+                const data: MeteoData[] = await response.json();
+                setData(data);
+            } catch {
+                setError('Fehler beim Laden der Daten');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return <CircularProgress />;
+    }
+
+    if (error) {
+        return <Typography color="error">{error}</Typography>;
     }
 
     return (
-        <Table>
-            <thead>
-            <tr>
-                <th>Datum</th>
-                <th>Standort</th>
-                <th>Standortname</th>
-                <th>Lat</th>
-                <th>Lng</th>
-                <th>Rain Duration</th>
-                <th>Str Glo</th>
-                <th>Temperatur</th>
-                <th>Max. Temperatur (h1)</th>
-                <th>Druck</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>{new Date(data.Datum).toLocaleDateString()}</td> {/* Datum formatieren */}
-                <td>{data.Standort}</td>
-                <td>{data.Standortname}</td>
-                <td>{data.WGS84_lat}</td>
-                <td>{data.WGS84_lng}</td>
-                <td>{data.RainDur}</td>
-                <td>{data.StrGlo}</td>
-                <td>{data.T}</td>
-                <td>{data.T_max_h1}</td>
-                <td>{data.p}</td>
-            </tr>
-            </tbody>
-        </Table>
+        <TableContainer component={Paper}>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Datum</TableCell>
+                        <TableCell>Standort</TableCell>
+                        <TableCell>Standortname</TableCell>
+                        <TableCell>Temperatur (°C)</TableCell>
+                        <TableCell>Max. Temperatur (°C)</TableCell>
+                        <TableCell>Druck (hPa)</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {data.map((row) => (
+                        <TableRow key={row.Datum}>
+                            <TableCell>{new Date(row.Datum).toLocaleDateString()}</TableCell>
+                            <TableCell>{row.Standort}</TableCell>
+                            <TableCell>{row.Standortname}</TableCell>
+                            <TableCell>{row.T}</TableCell>
+                            <TableCell>{row.T_max_h1}</TableCell>
+                            <TableCell>{row.p}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
     );
 };
 
