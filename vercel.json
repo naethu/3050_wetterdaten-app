@@ -2,10 +2,7 @@
   "builds": [
     {
       "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "installCommand": "npm install --legacy-peer-deps"
-      }
+      "use": "@vercel/static-build"
     },
     {
       "src": "backend/main.py",
@@ -15,5 +12,6 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "backend/main.py" },
     { "src": "/(.*)", "dest": "frontend/$1" }
-  ]
+  ],
+  "excludeFiles": ["backend/tests/*", "backend/docs/*", "large_data/*"]
 }
