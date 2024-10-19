@@ -12,6 +12,5 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "backend/main.py" },
     { "src": "/(.*)", "dest": "frontend/$1" }
-  ],
-  "excludeFiles": ["backend/tests/*", "backend/docs/*", "large_data/*"]
+  ]
 }
