@@ -18,7 +18,7 @@ app.add_middleware(
 )
 
 def load_data():
-    json_file_path = os.path.join(os.path.dirname(__file__), "..", "data", "meteodaten_2023_daily.json")
+    json_file_path = os.path.join(os.path.dirname(__file__), "data", "meteodaten_2023_daily.json")
     with open(json_file_path, "r") as file:
         data = json.load(file)
     return data
