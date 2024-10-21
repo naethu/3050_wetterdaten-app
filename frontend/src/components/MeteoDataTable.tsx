@@ -1,5 +1,4 @@
-// src/components/MeteoDataTable.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
     Table,
     TableBody,
@@ -10,20 +9,8 @@ import {
     Paper,
     CircularProgress,
     Typography,
-} from '@mui/material';
-
-interface MeteoData {
-    Datum: number;
-    Standort: string;
-    Standortname: string;
-    WGS84_lat: number;
-    WGS84_lng: number;
-    RainDur: number;
-    StrGlo: number | null;
-    T: number;
-    T_max_h1: number;
-    p: number;
-}
+} from "@mui/material";
+import { MeteoData } from "../types/meteodata";
 
 const MeteoDataTable: React.FC = () => {
     const [data, setData] = useState<MeteoData[]>([]);
@@ -72,7 +59,7 @@ const MeteoDataTable: React.FC = () => {
                 </TableHead>
                 <TableBody>
                     {data.map((row) => (
-                        <TableRow key={row.Datum}>
+                        <TableRow key={`${row.WGS84_lat}-${row.WGS84_lng}-${row.Datum}`}>
                             <TableCell>{new Date(row.Datum).toLocaleDateString()}</TableCell>
                             <TableCell>{row.Standort}</TableCell>
                             <TableCell>{row.Standortname}</TableCell>
