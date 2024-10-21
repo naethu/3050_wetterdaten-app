@@ -33,7 +33,7 @@ const MeteoDataTable: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:8000');
+                const response = await fetch('http://3050-wetterdaten-app.vercel.app/api/wetterdaten');
                 if (!response.ok) {
                     throw new Error('Netzwerkantwort war nicht ok');
                 }

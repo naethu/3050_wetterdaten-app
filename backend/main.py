@@ -10,7 +10,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://3050-wetterdaten-app.vercel.app/"
+        "https://naethu.github.io/3050-wetterdaten-app/"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -23,7 +23,7 @@ def load_data():
         data = json.load(file)
     return data
 
-@app.get("/")
+@app.get("/api/wetterdaten")
 async def get_meteodaten():
     try:
         data = load_data()
