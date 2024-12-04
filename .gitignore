@@ -1,7 +1,19 @@
-frontend/node_modules
+# Node modules
+node_modules/
+frontend/node_modules/
+
+# macOS
 .DS_Store
-dist
-dist-ssr
+
+# Build output
+dist/
+dist-ssr/
+
+# Local environment files
 *.local
+
+# Logs
 *.log
-.idea
+
+# IDE-specific files
+.idea/
