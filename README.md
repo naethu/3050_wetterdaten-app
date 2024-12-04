@@ -43,7 +43,7 @@
    ```
 6. Installiere die npm-Abhängigkeiten:
     ```bash
-   npm install
+   yarn
    ```
 
 ## Anwendung starten
@@ -59,5 +59,5 @@
 
   ```bash
   cd frontend
-  npm start
+  yarn start
   ```
