@@ -2,9 +2,9 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AppBar from "./components/AppBar";
 import MapPage from "./components/MapPage";
-import WeatherChart from "./components/WeatherChart";
+import WeatherChart from "./components/WeatherDataPage.tsx";
 import { Container } from "@mui/material";
-import { MeteoData } from "./types/meteodata";
+import { MeteoData } from "./types/MeteoData.ts";
 import MeteoDataTable from "./components/MeteoDataTable.tsx";
 
 const App: React.FC = () => {
@@ -49,16 +49,19 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <AppBar />
-      <Container maxWidth="lg">
-        <Routes>
-          {/* Setze MapPage als Startseite */}
-          <Route path="/" element={<MapPage data={locations} />} />
-          <Route path="/map" element={<MapPage data={locations} />} />
-          <Route path="/table" element={<MeteoDataTable />} />
-          <Route path="/weather" element={<WeatherChart data={locations} />} />
-        </Routes>
-      </Container>
+      <header className="header">
+        <AppBar />
+      </header>
+      <body className="body">
+        <Container maxWidth="lg">
+          <Routes>
+            <Route path="/" element={<MapPage data={locations} />} />
+            <Route path="/map" element={<MapPage data={locations} />} />
+            <Route path="/table" element={<MeteoDataTable />} />
+            <Route path="/weather" element={<WeatherChart />} />
+          </Routes>
+        </Container>
+      </body>
     </Router>
   );
 };

@@ -1,13 +1,10 @@
-.table-container {
+.paper-container {
   height: 100vh;
   width: 100%;
   padding: 20px;
-  box-sizing: border-box;
 }
 
-.table-container-inner {
-  height: calc(100% - 40px);
-  width: calc(100% - 40px);
-  border-radius: 10px;
-  overflow: hidden;
+.data-grid {
+  border: 0;
+  padding: 8px;
 }

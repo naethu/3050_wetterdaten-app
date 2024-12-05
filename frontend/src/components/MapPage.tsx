@@ -2,7 +2,7 @@ import React from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { MeteoData } from "../types/meteodata";
+import { MeteoData } from "../types/MeteoData.ts";
 import "./MapPage.css";
 
 const markerIcon = L.icon({

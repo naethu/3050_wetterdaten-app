@@ -1,34 +1,26 @@
-/* appbar.css */
-/* appbar.css */
-
-/* Stil für den Button ohne Material-UI-Stile zu überschreiben */
 .MuiButton-root {
-  color: white !important; /* Erzwingt, dass die Textfarbe weiß bleibt */
-  background-color: transparent !important; /* Hintergrund bleibt transparent */
+  color: white !important;
+  background-color: transparent !important;
 }
 
-/* Flexbox für die Navigation */
-/* AppBar und Button */
 .appbar-box {
   display: flex;
   justify-content: flex-end;
   flex-grow: 1;
-  z-index: 10; /* Setze einen höheren Z-Index für die Box */
+  z-index: 10;
 }
 
 .appbar-button {
   margin: 0 8px;
   color: white;
   background-color: transparent;
-  z-index: 20; /* Buttons haben einen höheren Z-Index als andere Elemente */
+  z-index: 20;
 }
 
-/* Map-Icon (immer sichtbar) */
 .appbar-map-icon {
   margin-right: 8px;
 }
 
-/* Titel der App */
 .appbar-title {
   margin-right: 16px;
   display: flex;
@@ -39,9 +31,8 @@
   text-decoration: none;
 }
 
-/* Zusätzliche Anpassungen für mobile Geräte */
 @media (max-width: 600px) {
   .appbar-button {
-    margin: 0 5px; /* Weniger Platz für Buttons auf kleinen Geräten */
+    margin: 0 5px;
   }
 }
