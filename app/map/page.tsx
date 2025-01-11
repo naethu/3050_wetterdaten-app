@@ -11,6 +11,7 @@ import VectorSource from "ol/source/Vector";
 import Feature from "ol/Feature";
 import Point from "ol/geom/Point";
 import { Style, Icon } from "ol/style";
+import Overlay from "ol/Overlay";
 
 interface Station {
     Standortname: string;
@@ -22,6 +23,7 @@ const Map: React.FC = () => {
     const mapRef = useRef<HTMLDivElement | null>(null); // Reference to the map container
     const [stations, setStations] = useState<Station[]>([]);
 
+    // Fetch stations data from the API
     useEffect(() => {
         const fetchStations = async () => {
             try {
@@ -38,46 +40,88 @@ const Map: React.FC = () => {
         fetchStations();
     }, []);
 
+    // Create the OpenLayers map when stations data is available
     useEffect(() => {
-        // Ensure mapRef.current is not null before proceeding
-        if (mapRef.current) {
+        if (mapRef.current && stations.length > 0) {
+            // Calculate the center of the map (average of latitudes and longitudes)
+            const avgLat = stations.reduce((sum, station) => sum + station.WGS84_lat, 0) / stations.length;
+            const avgLng = stations.reduce((sum, station) => sum + station.WGS84_lng, 0) / stations.length;
+
             // Create the map
             const map = new OlMap({
-                target: mapRef.current!, // Non-null assertion to ensure mapRef.current is not null
+                target: mapRef.current,
                 layers: [
                     new TileLayer({
-                        source: new OSM(),
+                        source: new OSM(), // Use OpenStreetMap tiles
                     }),
                 ],
                 view: new View({
-                    center: fromLonLat([8.524004, 47.384358]), // Longitude, Latitude
-                    zoom: 13,
+                    center: fromLonLat([avgLng, avgLat]), // Center the map on the average coordinates
+                    zoom: 13, // Set zoom level
                 }),
             });
 
-            // Add station markers
+            // Create a vector source for the markers
             const vectorSource = new VectorSource();
+
+            // Create a popup overlay
+            const popupElement = document.createElement("div");
+            popupElement.style.background = "white";
+            popupElement.style.padding = "5px";
+            popupElement.style.borderRadius = "5px";
+            popupElement.style.position = "absolute";
+            popupElement.style.pointerEvents = "none";
+            popupElement.style.display = "none"; // Initially hide the popup
+
+            const popup = new Overlay({
+                element: popupElement,
+                positioning: "bottom-center",
+                offset: [0, -20], // Adjust the popup's position
+            });
+
+            map.addOverlay(popup);
+
+            // Add station markers
             stations.forEach((station) => {
+                const coordinates = fromLonLat([station.WGS84_lng, station.WGS84_lat]);
+
                 const marker = new Feature({
-                    geometry: new Point(fromLonLat([station.WGS84_lng, station.WGS84_lat])),
+                    geometry: new Point(coordinates), // Coordinates are in [lng, lat]
                     name: station.Standortname,
                 });
+
                 marker.setStyle(
                     new Style({
                         image: new Icon({
-                            src: "https://openlayers.org/en/v6.5.0/examples/data/icon.png", // Marker icon
-                            scale: 0.05,
+                            src: "https://maps.google.com/mapfiles/ms/icons/red-dot.png", // Google Maps pin
+                            scale: 1, // Increase scale to make it more visible
                         }),
                     })
                 );
-                vectorSource.addFeature(marker);
+
+                vectorSource.addFeature(marker); // Add the marker to the vector source
+
+                // Add a click handler for the popup
+                // @ts-ignore
+                marker.on("click", (event) => {
+                    // @ts-ignore
+                    const clickedCoordinate = event.coordinate;
+                    popup.setPosition(clickedCoordinate); // Position the popup at the marker's location
+
+                    // Set the content of the popup and show it
+                    popupElement.innerHTML = `<strong>${station.Standortname}</strong>`;
+                    popupElement.style.display = "block"; // Make the popup visible
+                });
             });
 
+            // Add vector layer to the map
             const vectorLayer = new VectorLayer({
                 source: vectorSource,
             });
-
             map.addLayer(vectorLayer);
+
+            // Make sure the map is refreshed
+            map.render();
 
             // Clean up map on unmount
             return () => {
@@ -90,7 +134,7 @@ const Map: React.FC = () => {
     return (
         <div
             ref={mapRef}
-            style={{ height: "480px", width: "100%" }}
+            style={{ height: "480px", width: "100%" }} // Adjust map size
         />
     );
 };
@@ -103,7 +147,7 @@ export default function Page() {
                     Karte mit Standorten der Wetterstationen aus der API
                 </h2>
                 <div className="w-full">
-                    <Map />
+                    <Map /> {/* Render the Map component */}
                 </div>
             </div>
         </div>
