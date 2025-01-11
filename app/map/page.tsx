@@ -1,11 +1,16 @@
 "use client";
 
-import React, {useEffect, useState} from "react";
-import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
-import {LatLngExpression} from "leaflet";
-import "leaflet/dist/leaflet.css";
-import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
-import "leaflet-defaulticon-compatibility";
+import React, { useEffect, useRef, useState } from "react";
+import "ol/ol.css";
+import { Map as OlMap, View } from "ol";
+import TileLayer from "ol/layer/Tile";
+import OSM from "ol/source/OSM";
+import { fromLonLat } from "ol/proj";
+import VectorLayer from "ol/layer/Vector";
+import VectorSource from "ol/source/Vector";
+import Feature from "ol/Feature";
+import Point from "ol/geom/Point";
+import { Style, Icon } from "ol/style";
 
 interface Station {
     Standortname: string;
@@ -13,11 +18,8 @@ interface Station {
     WGS84_lng: number;
 }
 
-const defaults = {
-    zoom: 13,
-};
-
 const Map: React.FC = () => {
+    const mapRef = useRef<HTMLDivElement | null>(null); // Reference to the map container
     const [stations, setStations] = useState<Station[]>([]);
 
     useEffect(() => {
@@ -36,28 +38,56 @@ const Map: React.FC = () => {
         fetchStations();
     }, []);
 
+    useEffect(() => {
+        if (!mapRef.current) return;
+
+        // Create the map
+        const map = new OlMap({
+            target: mapRef.current,
+            layers: [
+                new TileLayer({
+                    source: new OSM(),
+                }),
+            ],
+            view: new View({
+                center: fromLonLat([8.524004, 47.384358]), // Longitude, Latitude
+                zoom: 13,
+            }),
+        });
+
+        // Add station markers
+        const vectorSource = new VectorSource();
+        stations.forEach((station) => {
+            const marker = new Feature({
+                geometry: new Point(fromLonLat([station.WGS84_lng, station.WGS84_lat])),
+                name: station.Standortname,
+            });
+            marker.setStyle(
+                new Style({
+                    image: new Icon({
+                        src: "https://openlayers.org/en/v6.5.0/examples/data/icon.png", // Marker icon
+                        scale: 0.05,
+                    }),
+                })
+            );
+            vectorSource.addFeature(marker);
+        });
+
+        const vectorLayer = new VectorLayer({
+            source: vectorSource,
+        });
+
+        map.addLayer(vectorLayer);
+
+        // Clean up map on unmount
+        return () => map.setTarget(null);
+    }, [stations]);
+
     return (
-        <div>
-            <MapContainer
-                center={[47.384358, 8.524004]}
-                zoom={defaults.zoom}
-                scrollWheelZoom={false}
-                style={{height: "480px", width: "100%"}}  // Set a fixed height for the map
-            >
-                <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                {stations.map((station) => (
-                    <Marker
-                        key={station.Standortname}
-                        position={[station.WGS84_lat, station.WGS84_lng] as LatLngExpression}
-                    >
-                        <Popup>{station.Standortname}</Popup>
-                    </Marker>
-                ))}
-            </MapContainer>
-        </div>
+        <div
+            ref={mapRef}
+            style={{ height: "480px", width: "100%" }}
+        />
     );
 };
 
@@ -65,10 +95,11 @@ export default function Page() {
     return (
         <div className="flex justify-center w-full px-4">
             <div className="w-full max-w-screen-lg my-5">
-                <h2 className="text-center text-xl font-semibold mb-4">Karte mit Standorten der Wetterstationen aus der
-                    API</h2>
+                <h2 className="text-center text-xl font-semibold mb-4">
+                    Karte mit Standorten der Wetterstationen aus der API
+                </h2>
                 <div className="w-full">
-                    <Map/>
+                    <Map />
                 </div>
             </div>
         </div>
