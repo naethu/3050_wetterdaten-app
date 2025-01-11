@@ -39,48 +39,52 @@ const Map: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        if (!mapRef.current) return;
-
-        // Create the map
-        const map = new OlMap({
-            target: mapRef.current,
-            layers: [
-                new TileLayer({
-                    source: new OSM(),
-                }),
-            ],
-            view: new View({
-                center: fromLonLat([8.524004, 47.384358]), // Longitude, Latitude
-                zoom: 13,
-            }),
-        });
-
-        // Add station markers
-        const vectorSource = new VectorSource();
-        stations.forEach((station) => {
-            const marker = new Feature({
-                geometry: new Point(fromLonLat([station.WGS84_lng, station.WGS84_lat])),
-                name: station.Standortname,
-            });
-            marker.setStyle(
-                new Style({
-                    image: new Icon({
-                        src: "https://openlayers.org/en/v6.5.0/examples/data/icon.png", // Marker icon
-                        scale: 0.05,
+        // Ensure mapRef.current is not null before proceeding
+        if (mapRef.current) {
+            // Create the map
+            const map = new OlMap({
+                target: mapRef.current!, // Non-null assertion to ensure mapRef.current is not null
+                layers: [
+                    new TileLayer({
+                        source: new OSM(),
                     }),
-                })
-            );
-            vectorSource.addFeature(marker);
-        });
+                ],
+                view: new View({
+                    center: fromLonLat([8.524004, 47.384358]), // Longitude, Latitude
+                    zoom: 13,
+                }),
+            });
 
-        const vectorLayer = new VectorLayer({
-            source: vectorSource,
-        });
+            // Add station markers
+            const vectorSource = new VectorSource();
+            stations.forEach((station) => {
+                const marker = new Feature({
+                    geometry: new Point(fromLonLat([station.WGS84_lng, station.WGS84_lat])),
+                    name: station.Standortname,
+                });
+                marker.setStyle(
+                    new Style({
+                        image: new Icon({
+                            src: "https://openlayers.org/en/v6.5.0/examples/data/icon.png", // Marker icon
+                            scale: 0.05,
+                        }),
+                    })
+                );
+                vectorSource.addFeature(marker);
+            });
 
-        map.addLayer(vectorLayer);
+            const vectorLayer = new VectorLayer({
+                source: vectorSource,
+            });
 
-        // Clean up map on unmount
-        return () => map.setTarget(null);
+            map.addLayer(vectorLayer);
+
+            // Clean up map on unmount
+            return () => {
+                // @ts-ignore
+                map.setTarget(null);
+            };
+        }
     }, [stations]);
 
     return (
