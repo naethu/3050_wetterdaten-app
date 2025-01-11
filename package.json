@@ -8,8 +8,7 @@
     "dev": "concurrently \"npm run next-dev\" \"npm run fastapi-dev\"",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "npm cache clean --force"
+    "lint": "next lint"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
