@@ -17,7 +17,7 @@ const WeatherDataPage: React.FC = () => {
             try {
                 const response = await fetch("/api/py/data");
                 if (!response.ok) {
-                    throw new Error("Netzwerkantwort war nicht ok");
+                    console.error("Netzwerkfehler");
                 }
                 const data: MeteoData[] = await response.json();
 
@@ -29,7 +29,7 @@ const WeatherDataPage: React.FC = () => {
             } catch (error: unknown) {
                 if (error instanceof Error) {
                     console.error("Fehler beim Laden der Daten:", error.message);
-                    setError(`Fehler beim Laden der Daten: ${error.message}`);
+                    setError("Fehler beim Laden der Daten: ${error.message}");
                 } else {
                     console.error("Unbekannter Fehler:", error);
                     setError("Unbekannter Fehler aufgetreten");
@@ -39,7 +39,7 @@ const WeatherDataPage: React.FC = () => {
             }
         };
 
-        fetchData();
+        void fetchData();
     }, []);
 
     const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

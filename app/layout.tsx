@@ -1,3 +1,4 @@
+import React from "react";
 import "./globals.css";
 import {Inter} from "next/font/google";
 import NavbarBootstrap from "@/app/components/navbar";
@@ -19,7 +20,7 @@ export default function RootLayout({
   return (
       <html lang="en">
       <Head>
-        <link rel="icon" href="/wetter-app.png" type="image/png"/>
+          <link rel="icon" href="/favicon.ico"/>
       </Head>
       <body className={`${inter.className} d-flex flex-column min-vh-100`}>
       <NavbarBootstrap/>
